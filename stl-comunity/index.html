@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STL Community — Área de Membros</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Tela de Acesso Opcional (ativada/desativada em data/catalog.js) -->
+  <div id="auth-gate" class="auth-gate hidden" aria-hidden="true">
+    <div class="auth-card">
+      <div class="brand-badge">STL COMMUNITY</div>
+      <h1>Área de Membros</h1>
+      <p>Digite o código de acesso enviado no seu e-mail para liberar os arquivos.</p>
+      <form id="auth-form">
+        <input
+          type="password"
+          id="auth-code"
+          placeholder="Código de acesso"
+          autocomplete="off"
+          required
+        />
+        <button type="submit" class="btn-primary">Entrar na Área de Membros</button>
+      </form>
+      <p id="auth-error" class="auth-error hidden">Código inválido. Verifique seu e-mail e tente novamente.</p>
+    </div>
+  </div>
+
+  <!-- Aplicação Principal -->
+  <div id="app-shell" class="app-shell">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button id="menu-toggle" class="icon-btn mobile-only" aria-label="Abrir categorias">
+          ☰
+        </button>
+        <div class="brand">
+          <span class="brand-icon">◈</span>
+          <div>
+            <strong id="site-title">STL Community</strong>
+            <small id="site-subtitle">Biblioteca de Arquivos 3D</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="search"
+          id="search-input"
+          placeholder="Buscar categoria, modelo ou pasta..."
+          aria-label="Buscar arquivos STL"
+        />
+      </div>
+
+      <div class="topbar-actions">
+        <a id="support-link" href="#" target="_blank" rel="noopener noreferrer" class="btn-ghost">
+          Suporte
+        </a>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- Sidebar de Categorias -->
+      <aside id="sidebar" class="sidebar">
+        <div class="sidebar-section">
+          <p class="sidebar-label">Navegação</p>
+          <nav id="category-nav" class="category-nav"></nav>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="stats-box">
+            <span id="total-modules">0</span>
+            <small>arquivos STL no acervo</small>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Conteúdo Principal -->
+      <main class="main-content">
+        <!-- Banner de Boas-Vindas -->
+        <section class="hero-banner">
+          <div>
+            <span class="hero-pill">Acesso Liberado • Download Direto</span>
+            <h1 id="hero-title">Seu Pack Completo de Arquivos STL</h1>
+            <p id="hero-description">
+              Escolha uma categoria abaixo e clique em Baixar ou Abrir em qualquer modelo.
+            </p>
+          </div>
+        </section>
+
+        <!-- Aviso de Migração / Servidor -->
+        <section id="server-notice" class="notice-banner hidden" role="status">
+          <div class="notice-icon" aria-hidden="true">⚡</div>
+          <div class="notice-content">
+            <div class="notice-header">
+              <span id="notice-badge" class="notice-badge">Atualização</span>
+              <strong id="notice-title">Migração de servidor em andamento</strong>
+            </div>
+            <p id="notice-message"></p>
+          </div>
+        </section>
+
+        <!-- Barra de Status / Filtros -->
+        <section class="toolbar">
+          <div class="toolbar-info">
+            <h2 id="active-category-title">Todas as Categorias</h2>
+            <span id="results-count" class="results-count">0 itens</span>
+          </div>
+          <div class="filter-pills" id="type-filters">
+            <button class="pill active" data-section="all">Todos</button>
+            <button class="pill" data-section="available">Disponíveis Agora</button>
+            <button class="pill" data-section="principal">01 - Pack Principal</button>
+            <button class="pill" data-section="bonus">02 - Bônus Pro</button>
+          </div>
+        </section>
+
+        <!-- Grid de Módulos -->
+        <section id="modules-grid" class="modules-grid" aria-live="polite"></section>
+
+        <!-- Estado Vazio -->
+        <section id="empty-state" class="empty-state hidden">
+          <h3>Nenhum módulo encontrado</h3>
+          <p>Tente buscar por outro termo ou limpar os filtros selecionados.</p>
+          <button id="reset-filters" class="btn-primary">Mostrar tudo</button>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="data/catalog.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
