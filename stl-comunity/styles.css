@@ -563,18 +563,19 @@ a {
 /* Grid Galeria estilo Tripo Studio */
 .modules-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
   gap: 14px;
 }
 
 .module-card {
   position: relative;
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
   transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
 }
 
@@ -587,8 +588,8 @@ a {
 .card-cover {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3.6;
-  background: radial-gradient(circle at 50% 45%, #231e19 0%, #0d0c0b 85%);
+  aspect-ratio: 4 / 4.4;
+  background: radial-gradient(circle at 50% 45%, #2a241e 0%, #141210 65%, #0b0a09 100%);
   overflow: hidden;
 }
 
@@ -599,6 +600,67 @@ a {
   object-position: center;
   display: block;
   transition: transform 0.35s ease, filter 0.35s ease;
+}
+
+/* Rodapé minimalista estilo Tripo (1 linha limpa) */
+.card-footer-bar {
+  padding: 10px 12px;
+  background: rgba(16, 15, 14, 0.96);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.card-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-avatar-dot {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--accent);
+  background: rgba(245, 180, 75, 0.14);
+  border: 1px solid rgba(245, 180, 75, 0.3);
+}
+
+.card-title-wrap h3 {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-mini-dl {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.18s ease;
+}
+
+.card-mini-dl:hover {
+  color: #110d07;
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 /* Efeito Hover Modo Filamento PLA (monocromático fosco estilo impressão 3D simples) */

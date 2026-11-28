@@ -75,8 +75,8 @@
   function applySiteInfo() {
     els.siteTitle.textContent = catalog.site.title;
     els.siteSubtitle.textContent = catalog.site.subtitle;
-    els.heroTitle.textContent = catalog.site.heroTitle;
-    els.heroDescription.textContent = catalog.site.heroDescription;
+    if (els.heroTitle) els.heroTitle.textContent = catalog.site.heroTitle;
+    if (els.heroDescription) els.heroDescription.textContent = catalog.site.heroDescription;
     els.supportLink.href = catalog.site.supportUrl || "#";
     els.totalModules.textContent = formatNumber(getTotalCatalogFiles());
 
@@ -166,61 +166,32 @@
       const card = document.createElement("article");
       card.className = "module-card";
 
-      const isAvailable = mod.status === "available";
       const has3D = Boolean(mod.modelUrl);
+      const imgId = `thumb-${mod.id}`;
       const coverHtml = mod.coverImage
-        ? `<img src="${mod.coverImage}" alt="${mod.title}" loading="lazy" />`
-        : `<div class="card-icon">${mod.icon || "📁"}</div>`;
-
-      const catInfo = catalog.categories.find((c) => c.id === mod.categoryId);
-      const badgeClass = isAvailable ? "card-badge-available" : "card-badge-migrating";
-      const badgeText = isAvailable
-        ? mod.badge || "Disponível"
-        : catInfo?.fileCount
-          ? `${formatNumber(catInfo.fileCount)} STLs`
-          : "Coleção 3D";
-
-      const subText = isAvailable ? "Pronto p/ baixar" : mod.section === "principal" ? "Pack Principal" : "Bônus Pro";
-
-      const actionsHtml = isAvailable
-        ? `
-          <div class="card-actions">
-            ${
-              has3D
-                ? `<button type="button" class="btn-secondary btn-open-3d">◈ Ver em 3D</button>`
-                : `<a href="${mod.openUrl}" target="_blank" rel="noopener noreferrer" class="btn-secondary">Abrir ↗</a>`
-            }
-            <a
-              href="${mod.downloadUrl}"
-              target="_blank"
-              rel="noopener noreferrer"
-              download
-              class="btn-primary"
-            >
-              Baixar ↓
-            </a>
-          </div>
-        `
-        : "";
+        ? `<img id="${imgId}" src="${mod.coverImage}" alt="${mod.title}" loading="lazy" />`
+        : `<img id="${imgId}" alt="${mod.title}" />`;
 
       card.innerHTML = `
         <div class="card-cover ${has3D ? "card-cover-interactive" : ""}">
           ${coverHtml}
           <span class="filament-pill">◈ Filamento PLA</span>
-          ${has3D ? `<span class="badge-3d-live">◈ 3D Interativo</span>` : ""}
-          <span class="card-badge-overlay ${badgeClass}">${badgeText}</span>
         </div>
         <div class="card-footer-bar">
-          <div class="card-title-row">
+          <div class="card-title-wrap">
+            <span class="card-avatar-dot">◈</span>
             <h3 title="${mod.title}">${mod.title}</h3>
-            <span class="card-sub">${subText}</span>
           </div>
-          ${actionsHtml}
+          ${
+            mod.downloadUrl
+              ? `<a href="${mod.downloadUrl}" target="_blank" rel="noopener noreferrer" download class="card-mini-dl" title="Baixar modelo" onclick="event.stopPropagation()">↓</a>`
+              : ""
+          }
         </div>
       `;
 
       if (has3D) {
-        const trigger3D = () => {
+        card.addEventListener("click", () => {
           if (typeof window.openStudio3D === "function") {
             window.openStudio3D(mod);
           } else if (window.location.protocol === "file:") {
@@ -228,10 +199,15 @@
               "O Visualizador 3D não abre direto em file:// por bloqueio de segurança do navegador.\n\nDê dois cliques em ABRIR_LOCAL.bat na pasta do projeto ou abra pelo link da Vercel!"
             );
           }
-        };
-        card.querySelector(".card-cover").addEventListener("click", trigger3D);
-        const btn3D = card.querySelector(".btn-open-3d");
-        if (btn3D) btn3D.addEventListener("click", trigger3D);
+        });
+
+        if (typeof window.renderModelThumbnail === "function") {
+          window.renderModelThumbnail(mod.modelUrl, imgId);
+        } else {
+          window.addEventListener("studio3d-ready", () => {
+            window.renderModelThumbnail?.(mod.modelUrl, imgId);
+          }, { once: true });
+        }
       }
 
       els.modulesGrid.appendChild(card);

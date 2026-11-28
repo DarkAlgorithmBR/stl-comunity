@@ -38,7 +38,6 @@ window.STL_CATALOG = {
       categoryId: "personagens",
       section: "principal",
       status: "available",
-      coverImage: "assets/covers/personagens-colecionaveis.jpg",
       modelUrl: "assets/models/guerreira-viking.glb",
       title: "Guerreira Viking",
       fileName: "guerreira-viking.glb",

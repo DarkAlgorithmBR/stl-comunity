@@ -375,3 +375,68 @@ gridBtn.addEventListener("click", () => {
 });
 
 window.openStudio3D = openStudio3D;
+
+// Gera miniatura limpa em estúdio diretamente do arquivo .glb / .stl para o card da galeria
+const thumbCache = new Map();
+window.renderModelThumbnail = async function (modelUrl, imgId) {
+  if (!modelUrl) return;
+  if (thumbCache.has(modelUrl)) {
+    const img = document.getElementById(imgId);
+    if (img) img.src = thumbCache.get(modelUrl);
+    return;
+  }
+
+  try {
+    const w = 440;
+    const h = 480;
+    const offRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+    offRenderer.setSize(w, h);
+    offRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+    offRenderer.toneMappingExposure = 1.15;
+
+    const offScene = new THREE.Scene();
+    const pmrem = new THREE.PMREMGenerator(offRenderer);
+    offScene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+    const offCam = new THREE.PerspectiveCamera(38, w / h, 0.01, 100);
+    offCam.position.set(0.45, 0.35, 2.35);
+    offCam.lookAt(0, 0, 0);
+
+    offScene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const dir = new THREE.DirectionalLight(0xfff4e0, 2.2);
+    dir.position.set(3, 5, 4);
+    offScene.add(dir);
+
+    let obj;
+    if (modelUrl.toLowerCase().endsWith(".stl")) {
+      const geo = await new STLLoader().loadAsync(modelUrl);
+      geo.computeVertexNormals();
+      obj = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0xd4d4d8, roughness: 0.55 }));
+    } else {
+      const gltf = await new GLTFLoader().loadAsync(modelUrl);
+      obj = gltf.scene;
+    }
+
+    const box = new THREE.Box3().setFromObject(obj);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    const scale = 1.55 / (Math.max(size.x, size.y, size.z) || 1);
+    obj.scale.setScalar(scale);
+    obj.position.sub(center.multiplyScalar(scale));
+    offScene.add(obj);
+
+    offRenderer.render(offScene, offCam);
+    const dataUrl = offRenderer.domElement.toDataURL("image/png");
+    thumbCache.set(modelUrl, dataUrl);
+
+    const img = document.getElementById(imgId);
+    if (img) img.src = dataUrl;
+
+    pmrem.dispose();
+    offRenderer.dispose();
+  } catch (err) {
+    console.warn("Thumbnail 3D fallback:", err);
+  }
+};
+
+window.dispatchEvent(new Event("studio3d-ready"));
