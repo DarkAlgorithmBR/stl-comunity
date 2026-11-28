@@ -170,7 +170,7 @@
       const imgId = `thumb-${mod.id}`;
       const coverHtml = mod.coverImage
         ? `<img id="${imgId}" src="${mod.coverImage}" alt="${mod.title}" loading="lazy" />`
-        : `<img id="${imgId}" alt="${mod.title}" />`;
+        : `<img id="${imgId}" alt="${mod.title}" style="opacity:0;transition:opacity .25s ease;" onload="this.style.opacity=1" />`;
 
       card.innerHTML = `
         <div class="card-cover ${has3D ? "card-cover-interactive" : ""}">
@@ -201,12 +201,14 @@
           }
         });
 
-        if (typeof window.renderModelThumbnail === "function") {
-          window.renderModelThumbnail(mod.modelUrl, imgId);
-        } else {
-          window.addEventListener("studio3d-ready", () => {
-            window.renderModelThumbnail?.(mod.modelUrl, imgId);
-          }, { once: true });
+        if (!mod.coverImage) {
+          if (typeof window.renderModelThumbnail === "function") {
+            window.renderModelThumbnail(mod.modelUrl, imgId);
+          } else {
+            window.addEventListener("studio3d-ready", () => {
+              window.renderModelThumbnail?.(mod.modelUrl, imgId);
+            }, { once: true });
+          }
         }
       }
 
