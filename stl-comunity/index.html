@@ -3,17 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>STL Community — Área de Membros</title>
+  <title>Acervo Maker STL — Estúdio 3D</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
 </head>
 <body>
   <!-- Tela de Acesso Opcional (ativada/desativada em data/catalog.js) -->
   <div id="auth-gate" class="auth-gate hidden" aria-hidden="true">
     <div class="auth-card">
-      <div class="brand-badge">STL COMMUNITY</div>
+      <div class="brand-badge">ACERVO MAKER STL</div>
       <h1>Área de Membros</h1>
       <p>Digite o código de acesso enviado no seu e-mail para liberar os arquivos.</p>
       <form id="auth-form">
@@ -32,7 +40,7 @@
 
   <!-- Aplicação Principal -->
   <div id="app-shell" class="app-shell">
-    <!-- Topbar -->
+    <!-- Topbar Glassmorphism estilo Tripo Studio -->
     <header class="topbar">
       <div class="topbar-left">
         <button id="menu-toggle" class="icon-btn mobile-only" aria-label="Abrir categorias">
@@ -41,23 +49,27 @@
         <div class="brand">
           <span class="brand-icon">◈</span>
           <div>
-            <strong id="site-title">STL Community</strong>
-            <small id="site-subtitle">Biblioteca de Arquivos 3D</small>
+            <strong id="site-title">Acervo Maker STL</strong>
+            <small id="site-subtitle">Estúdio 3D • Área de Membros</small>
           </div>
         </div>
       </div>
 
       <div class="search-box">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon">⌕</span>
         <input
           type="search"
           id="search-input"
-          placeholder="Buscar categoria, modelo ou pasta..."
+          placeholder="Buscar coleção, modelo ou tema..."
           aria-label="Buscar arquivos STL"
         />
       </div>
 
       <div class="topbar-actions">
+        <button id="filament-toggle" class="btn-filament-toggle" type="button" title="Alternar todas as capas para modo filamento único">
+          <span class="filament-dot"></span>
+          Modo Filamento
+        </button>
         <a id="support-link" href="#" target="_blank" rel="noopener noreferrer" class="btn-ghost">
           Suporte
         </a>
@@ -68,63 +80,60 @@
       <!-- Sidebar de Categorias -->
       <aside id="sidebar" class="sidebar">
         <div class="sidebar-section">
-          <p class="sidebar-label">Navegação</p>
+          <p class="sidebar-label">Coleções</p>
           <nav id="category-nav" class="category-nav"></nav>
         </div>
 
         <div class="sidebar-footer">
           <div class="stats-box">
-            <span id="total-modules">0</span>
-            <small>arquivos STL no acervo</small>
+            <span id="total-modules">1</span>
+            <small>modelos 3D no estúdio</small>
           </div>
         </div>
       </aside>
 
       <!-- Conteúdo Principal -->
       <main class="main-content">
-        <!-- Banner de Boas-Vindas -->
+        <!-- Hero compacto estilo Estúdio -->
         <section class="hero-banner">
-          <div>
-            <span class="hero-pill">Acesso Liberado • Download Direto</span>
-            <h1 id="hero-title">Seu Pack Completo de Arquivos STL</h1>
+          <div class="hero-text">
+            <span class="hero-pill">◈ Estúdio 3D • Passe o mouse para ver em filamento</span>
+            <h1 id="hero-title">Acervo Maker STL</h1>
             <p id="hero-description">
-              Escolha uma categoria abaixo e clique em Baixar ou Abrir em qualquer modelo.
+              Explore todas as coleções organizadas. Clique nos modelos 3D interativos para girar em 360° e testar em filamento simples.
             </p>
           </div>
         </section>
 
-        <!-- Aviso de Migração / Servidor -->
+        <!-- Aviso Opcional -->
         <section id="server-notice" class="notice-banner hidden" role="status">
           <div class="notice-icon" aria-hidden="true">⚡</div>
           <div class="notice-content">
             <div class="notice-header">
               <span id="notice-badge" class="notice-badge">Atualização</span>
-              <strong id="notice-title">Migração de servidor em andamento</strong>
+              <strong id="notice-title"></strong>
             </div>
             <p id="notice-message"></p>
           </div>
         </section>
 
-        <!-- Barra de Status / Filtros -->
+        <!-- Barra de Filtros -->
         <section class="toolbar">
           <div class="toolbar-info">
-            <h2 id="active-category-title">Todas as Categorias</h2>
+            <h2 id="active-category-title">Todas as Coleções</h2>
             <span id="results-count" class="results-count">0 itens</span>
           </div>
           <div class="filter-pills" id="type-filters">
             <button class="pill active" data-section="all">Todos</button>
-            <button class="pill" data-section="available">Disponíveis Agora</button>
-            <button class="pill" data-section="principal">01 - Pack Principal</button>
-            <button class="pill" data-section="bonus">02 - Bônus Pro</button>
           </div>
         </section>
 
-        <!-- Grid de Módulos -->
+        <!-- Grid Galeria estilo Tripo -->
         <section id="modules-grid" class="modules-grid" aria-live="polite"></section>
 
         <!-- Estado Vazio -->
         <section id="empty-state" class="empty-state hidden">
-          <h3>Nenhum módulo encontrado</h3>
+          <h3>Nenhum modelo encontrado</h3>
           <p>Tente buscar por outro termo ou limpar os filtros selecionados.</p>
           <button id="reset-filters" class="btn-primary">Mostrar tudo</button>
         </section>
@@ -132,7 +141,112 @@
     </div>
   </div>
 
+  <!-- Modal Visualizador 3D estilo Tripo Studio -->
+  <div id="studio-modal" class="studio-modal hidden" role="dialog" aria-modal="true" aria-labelledby="studio-title">
+    <div class="studio-backdrop" id="studio-backdrop"></div>
+    <div class="studio-shell">
+      <button id="studio-close" class="studio-close" aria-label="Fechar Estúdio 3D">✕</button>
+
+      <!-- Lado Esquerdo: Palco 3D -->
+      <div class="studio-stage">
+        <div id="studio-canvas-wrap" class="studio-canvas-wrap"></div>
+
+        <!-- Loading -->
+        <div id="studio-loading" class="studio-loading hidden">
+          <div class="studio-spinner"></div>
+          <span>Carregando malha 3D...</span>
+        </div>
+
+        <!-- Telemetria + Gizmo no topo direito -->
+        <div class="studio-hud-top">
+          <div class="studio-telemetry">
+            <div><span>Topologia</span><strong id="stat-topology">Triangle</strong></div>
+            <div><span>Faces</span><strong id="stat-faces">—</strong></div>
+            <div><span>Vértices</span><strong id="stat-vertices">—</strong></div>
+          </div>
+          <canvas id="studio-gizmo" class="studio-gizmo" width="72" height="72" title="Orientação dos eixos"></canvas>
+        </div>
+
+        <!-- Controles verticais de Estúdio (Luz + Grade) -->
+        <div class="studio-side-tools">
+          <button id="studio-light-btn" class="studio-tool-btn active" title="Alternar iluminação de estúdio">☀</button>
+          <div class="studio-tool-divider"></div>
+          <button id="studio-grid-btn" class="studio-tool-btn active" title="Mostrar/ocultar grade 3D">⊞</button>
+        </div>
+
+        <!-- Dock Flutuante de Materiais e Cores (estilo Tripo) -->
+        <div class="studio-dock">
+          <button class="dock-sphere active" data-mode="original" title="Original / Textura Colorida">
+            <span class="sphere-preview sphere-original"></span>
+          </button>
+          <button class="dock-sphere" data-mode="clay" title="Filamento PLA Fosco (Sem Cor)">
+            <span class="sphere-preview sphere-clay"></span>
+          </button>
+          <button class="dock-sphere" data-mode="metallic" title="Filamento Silk / Metálico">
+            <span class="sphere-preview sphere-metal"></span>
+          </button>
+          <button class="dock-icon-btn" id="studio-wireframe-btn" title="Mostrar Malha (Wireframe)">
+            ▤
+          </button>
+
+          <span class="dock-sep"></span>
+
+          <button class="dock-color" data-color="#d4d4d8" title="Filamento Cinza PLA" style="--swatch:#d4d4d8"></button>
+          <button class="dock-color" data-color="#f59e0b" title="Filamento Âmbar / Dourado" style="--swatch:#f59e0b"></button>
+          <button class="dock-color" data-color="#52525b" title="Filamento Grafite" style="--swatch:#52525b"></button>
+          <button class="dock-color" data-color="#2dd4bf" title="Filamento Turquesa" style="--swatch:#2dd4bf"></button>
+        </div>
+
+        <!-- Barra de Ações Inferior -->
+        <div class="studio-bottom-bar">
+          <button id="studio-reset-cam" class="studio-bar-btn" type="button">↻ Resetar Câmera</button>
+          <button id="studio-autorotate-btn" class="studio-bar-btn" type="button">⟲ Girar Auto</button>
+          <button id="studio-filament-quick" class="studio-bar-btn" type="button">◈ Impressão 3D (Filamento)</button>
+        </div>
+      </div>
+
+      <!-- Lado Direito: Painel de Detalhes -->
+      <aside class="studio-info-panel">
+        <div class="studio-creator">
+          <div class="studio-avatar">◈</div>
+          <div>
+            <strong>Acervo Maker STL</strong>
+            <span class="studio-pro-badge">Studio 3D</span>
+          </div>
+        </div>
+
+        <h2 id="studio-title">Modelo 3D</h2>
+        <p id="studio-desc" class="studio-desc"></p>
+
+        <div id="studio-tags" class="studio-tags"></div>
+
+        <div class="studio-specs">
+          <div class="spec-row">
+            <span>Arquivo</span>
+            <strong id="studio-filename">—</strong>
+          </div>
+          <div class="spec-row">
+            <span>Compatível</span>
+            <strong>FDM &amp; Resina</strong>
+          </div>
+          <div class="spec-row">
+            <span>Visualização</span>
+            <strong>360° Interativo</strong>
+          </div>
+        </div>
+
+        <div class="studio-cta">
+          <a id="studio-download-btn" href="#" download target="_blank" rel="noopener noreferrer" class="btn-studio-download">
+            ↓ Baixar Modelo 3D
+          </a>
+          <p class="studio-hint">Arraste com o mouse para girar • Scroll para zoom • Botão direito para mover</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
   <script src="data/catalog.js"></script>
+  <script type="module" src="viewer3d.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -6,6 +6,7 @@
     category: "all",
     section: "all",
     search: "",
+    filamentMode: false,
   };
 
   const els = {
@@ -19,6 +20,7 @@
     heroTitle: document.getElementById("hero-title"),
     heroDescription: document.getElementById("hero-description"),
     supportLink: document.getElementById("support-link"),
+    filamentToggle: document.getElementById("filament-toggle"),
     serverNotice: document.getElementById("server-notice"),
     noticeBadge: document.getElementById("notice-badge"),
     noticeTitle: document.getElementById("notice-title"),
@@ -59,10 +61,11 @@
   }
 
   function getTotalCatalogFiles() {
-    return catalog.categories.reduce((acc, cat) => {
-      if (cat.id === "all" || cat.id === "available-only") return acc;
+    const sum = catalog.categories.reduce((acc, cat) => {
+      if (cat.id === "all") return acc;
       return acc + (cat.fileCount || 0);
     }, 0);
+    return sum > 0 ? sum : catalog.modules.length;
   }
 
   function formatNumber(num) {
@@ -130,16 +133,8 @@
     const query = state.search.trim().toLowerCase();
 
     return catalog.modules.filter((mod) => {
-      const matchCategory =
-        state.category === "all" ||
-        (state.category === "available-only" && mod.status === "available") ||
-        mod.categoryId === state.category;
-
-      const matchSection =
-        state.section === "all" ||
-        (state.section === "available" && mod.status === "available") ||
-        mod.section === state.section;
-
+      const matchCategory = state.category === "all" || mod.categoryId === state.category;
+      const matchSection = state.section === "all" || mod.section === state.section;
       const matchSearch =
         !query ||
         mod.title.toLowerCase().includes(query) ||
@@ -172,31 +167,29 @@
       card.className = "module-card";
 
       const isAvailable = mod.status === "available";
-      const tagsHtml = (mod.tags || [])
-        .map((tag) => `<span class="tag">${tag}</span>`)
-        .join("");
-
+      const has3D = Boolean(mod.modelUrl);
       const coverHtml = mod.coverImage
         ? `<img src="${mod.coverImage}" alt="${mod.title}" loading="lazy" />`
         : `<div class="card-icon">${mod.icon || "📁"}</div>`;
 
-      const badgeClass = isAvailable ? "card-badge-available" : "card-badge-migrating";
       const catInfo = catalog.categories.find((c) => c.id === mod.categoryId);
+      const badgeClass = isAvailable ? "card-badge-available" : "card-badge-migrating";
       const badgeText = isAvailable
         ? mod.badge || "Disponível"
-        : `${catInfo?.fileCount ? formatNumber(catInfo.fileCount) + " arquivos • " : ""}Em migração`;
+        : catInfo?.fileCount
+          ? `${formatNumber(catInfo.fileCount)} STLs`
+          : "Coleção 3D";
 
-      const footerHtml = isAvailable
+      const subText = isAvailable ? "Pronto p/ baixar" : mod.section === "principal" ? "Pack Principal" : "Bônus Pro";
+
+      const actionsHtml = isAvailable
         ? `
-          <div class="card-footer">
-            <a
-              href="${mod.openUrl}"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="btn-secondary"
-            >
-              Abrir ↗
-            </a>
+          <div class="card-actions">
+            ${
+              has3D
+                ? `<button type="button" class="btn-secondary btn-open-3d">◈ Ver em 3D</button>`
+                : `<a href="${mod.openUrl}" target="_blank" rel="noopener noreferrer" class="btn-secondary">Abrir ↗</a>`
+            }
             <a
               href="${mod.downloadUrl}"
               target="_blank"
@@ -208,29 +201,38 @@
             </a>
           </div>
         `
-        : `
-          <div class="card-footer card-footer-single">
-            <button type="button" class="btn-migrating" disabled>
-              ⏳ Transferindo para o servidor...
-            </button>
-          </div>
-        `;
+        : "";
 
       card.innerHTML = `
-        <div class="card-cover">
+        <div class="card-cover ${has3D ? "card-cover-interactive" : ""}">
           ${coverHtml}
+          <span class="filament-pill">◈ Filamento PLA</span>
+          ${has3D ? `<span class="badge-3d-live">◈ 3D Interativo</span>` : ""}
           <span class="card-badge-overlay ${badgeClass}">${badgeText}</span>
         </div>
-        <div class="card-content">
-          <div class="card-body">
-            <h3>${mod.title}</h3>
-            ${mod.fileName ? `<div class="card-filename">${mod.fileName}</div>` : ""}
-            <p>${mod.description}</p>
-            <div class="card-meta">${tagsHtml}</div>
+        <div class="card-footer-bar">
+          <div class="card-title-row">
+            <h3 title="${mod.title}">${mod.title}</h3>
+            <span class="card-sub">${subText}</span>
           </div>
-          ${footerHtml}
+          ${actionsHtml}
         </div>
       `;
+
+      if (has3D) {
+        const trigger3D = () => {
+          if (typeof window.openStudio3D === "function") {
+            window.openStudio3D(mod);
+          } else if (window.location.protocol === "file:") {
+            alert(
+              "O Visualizador 3D não abre direto em file:// por bloqueio de segurança do navegador.\n\nDê dois cliques em ABRIR_LOCAL.bat na pasta do projeto ou abra pelo link da Vercel!"
+            );
+          }
+        };
+        card.querySelector(".card-cover").addEventListener("click", trigger3D);
+        const btn3D = card.querySelector(".btn-open-3d");
+        if (btn3D) btn3D.addEventListener("click", trigger3D);
+      }
 
       els.modulesGrid.appendChild(card);
     });
@@ -267,6 +269,14 @@
     els.menuToggle.addEventListener("click", () => {
       els.sidebar.classList.toggle("open");
     });
+
+    if (els.filamentToggle) {
+      els.filamentToggle.addEventListener("click", () => {
+        state.filamentMode = !state.filamentMode;
+        document.body.classList.toggle("filament-mode", state.filamentMode);
+        els.filamentToggle.classList.toggle("active", state.filamentMode);
+      });
+    }
   }
 
   initAuth();
